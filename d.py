@@ -7,7 +7,7 @@ from threading import Thread
 from requests import exceptions
 con = sqlite3.connect('./ip.db')
 cur = con.cursor()
-#cur.execute("create table ip (id integer primary key autoincrement,ip char)")
+cur.execute("create table ip (id integer primary key autoincrement,ip char)")
 q = queue.Queue()
 o = queue.Queue()
 def cip():#提取代理
@@ -56,11 +56,11 @@ def test_ip(q,o):
 cip()
 
 read_ip()
-for i in range(200):
-    t1 = Thread(target=test_ip, args=(q,o))
-    t1.start()
-t1.join()
-time.sleep(2)
+thread_list = [Thread(target=test_ip, args=(q,o)) for i in range(200)]
+for t in thread_list:
+    t.start()
+for t in thread_list:
+    t.join()
 while True:
     if o.empty():
         break
