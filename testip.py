@@ -6,7 +6,7 @@ from threading import Thread
 
 con = sqlite3.connect('./ip.db')
 cur = con.cursor()
-#cur.execute("create table ipn (id integer primary key autoincrement,ip char)")
+cur.execute("create table ipn (id integer primary key autoincrement,ip char)")
 ip = cur.execute("select ip from ip")
 uip = queue.Queue()
 q = queue.Queue()
@@ -29,10 +29,11 @@ def testip(q, uip):
                 print('失败', ip)
                 uip.put(ip)
     return uip
-for i in range(5):
-    t = Thread(target=testip, args=(q,uip))
+thread_list = [Thread(target=testip, args=(q,uip)) for i in range(5)]
+for t in thread_list:
     t.start()
-t.join()
+for t in thread_list:
+    t.join()
 time.sleep(1)
 def duip(uip):
     while True:
