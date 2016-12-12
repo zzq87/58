@@ -7,22 +7,22 @@ from threading import Thread
 from requests import exceptions
 con = sqlite3.connect('./ip.db')
 cur = con.cursor()
-cur.execute("create table ip (id integer primary key autoincrement,ip char)")
+#cur.execute("create table ip (id integer primary key autoincrement,ip char)")
 q = queue.Queue()
 o = queue.Queue()
 def cip():#提取代理
     ipre = r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}' #IP正则
     po1 = r'<td>\d{2,4}</td>' #端口正则
     headers = {"User-Agent":"Mozilla/5.0 (Linux; Android 5.0; SM-G900P Build/LRX21T) AppleWebKit/537.36 (KHTML, like Gecko)    Chrome/48.0.2564.23 Mobile Safari/537.36"} #伪造HEAD
-    for i in range(5):
-        t = requests.get("http://www.xicidaili.com/nn/{}".format(str(i+1)), headers=headers).content.decode("utf-8")
+    with open("./ip.txt",'w') as f:
+        for i in range(5):
+            t = requests.get("http://www.xicidaili.com/nn/{}".format(str(i+1)), headers=headers).content.decode("utf-8")
     #print(t)
-        soup = BeautifulSoup(t,"lxml")
-        s = soup.find_all("tr")
-        for i in s:
-            o = re.findall(ipre, str(i))
-            po = re.findall(po1,str(i))
-            with open("./ip.txt",'a') as f:
+            soup = BeautifulSoup(t,"lxml")
+            s = soup.find_all("tr")
+            for i in s:
+                o = re.findall(ipre, str(i))
+                po = re.findall(po1,str(i))
                 for (p,pot) in zip(o,po):
                     f.write(p+":"+pot.replace("<td>","").replace("</td>","")+'\n')
 
